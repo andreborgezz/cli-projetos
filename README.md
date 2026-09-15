@@ -9,8 +9,6 @@ Desenvolvido por **André Borges**, este gerador configura toda a estrutura base
 - **Front-end:** React + TypeScript (via Vite) com estrutura de componentes.
 - **Back-end:** Node.js + Express + TypeScript com estrutura de rotas e controllers.
 
-## Como usar na sua máquina
-
 ## Como instalar globalmente (Recomendado)
 
 Para que você possa digitar `cli-projetos` em **qualquer pasta do seu computador** e gerar um projeto novo, você precisa compilar e "linkar" o pacote globalmente no NPM.
@@ -28,25 +26,3 @@ Agora basta abrir qualquer terminal no seu computador e digitar o comando:
 ```bash
 cli-projetos
 ```
----
-
-Para usar a ferramenta localmente, siga os passos abaixo:
-
-### 1. Clonar o repositório
-```bash
-git clone https://github.com/SEU_USUARIO/cli-projetos.git
-cd cli-projetos
-```
-
-### 2. Instalar as dependências
-```bash
-npm install
-```
-
-### 3. Rodar em ambiente de desenvolvimento
-Se quiser apenas testar a CLI sem instalar no seu computador, rode:
-```bash
-npm run dev
-```
-
----
