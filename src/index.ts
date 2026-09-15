@@ -21,21 +21,62 @@ async function run() {
     console.clear();
     p.intro(`${color.bgCyan(color.black(' MEU GERADOR DE PROJETOS '))}`);
 
-    // 1. Nome do projeto com sanitização e validação
-    const projectName = await p.text({
-        message: 'Qual o nome do projeto?',
-        placeholder: 'meu-novo-app',
-        validate: (value) => {
-            if (!value) return 'O nome do projeto é obrigatório.';
-            if (!/^[a-z0-9-_]+$/i.test(value)) {
-                return 'Use apenas letras, números, hifens (-) e sublinhados (_).';
-            }
-            if (fs.existsSync(path.resolve(process.cwd(), value))) {
-                return `O diretório "${value}" já existe neste local!`;
-            }
-        },
+    // 1. Local e Nome do projeto
+    const location = await p.select({
+        message: 'Onde deseja criar o projeto?',
+        options: [
+            { value: 'new-folder', label: 'Nova pasta', hint: 'Cria uma nova pasta com o nome do projeto' },
+            { value: 'current-folder', label: 'Pasta atual', hint: 'Cria os arquivos na pasta atual (.)' },
+        ],
     });
-    handleCancel(projectName);
+    handleCancel(location);
+
+    let projectName: string | symbol = '';
+    let targetDir: string = process.cwd();
+
+    if (location === 'new-folder') {
+        projectName = await p.text({
+            message: 'Qual o nome do projeto?',
+            placeholder: 'meu-novo-app',
+            validate: (value) => {
+                if (!value) return 'O nome do projeto é obrigatório.';
+                if (!/^[a-z0-9-_]+$/i.test(value)) {
+                    return 'Use apenas letras, números, hifens (-) e sublinhados (_).';
+                }
+                if (fs.existsSync(path.resolve(process.cwd(), value))) {
+                    return `O diretório "${value}" já existe neste local!`;
+                }
+            },
+        });
+        handleCancel(projectName);
+        targetDir = path.resolve(process.cwd(), projectName as string);
+    } else {
+        const currentDirName = path.basename(process.cwd());
+        projectName = await p.text({
+            message: 'Qual o nome do projeto (para o package.json)?',
+            initialValue: currentDirName,
+            validate: (value) => {
+                if (!value) return 'O nome do projeto é obrigatório.';
+                if (!/^[a-z0-9-_]+$/i.test(value)) {
+                    return 'Use apenas letras, números, hifens (-) e sublinhados (_).';
+                }
+            },
+        });
+        handleCancel(projectName);
+
+        const files = await fs.readdir(process.cwd());
+        if (files.length > 0) {
+            const proceed = await p.confirm({
+                message: 'A pasta atual não está vazia. Deseja continuar mesmo assim?',
+                initialValue: false,
+            });
+            handleCancel(proceed);
+            if (!proceed) {
+                p.cancel('Operação abortada pelo usuário.');
+                process.exit(0);
+            }
+        }
+    }
 
     // 2. Tipo do projeto
     const projectType = await p.select({
@@ -81,9 +122,10 @@ async function run() {
 
     // 5. Cópia e Configuração do Template
     const s = p.spinner();
-    s.start(`Montando projeto em ./${String(projectName)}...`);
+    const isCurrentFolder = location === 'current-folder';
+    const displayDir = isCurrentFolder ? '.' : `./${String(projectName)}`;
+    s.start(`Montando projeto em ${displayDir}...`);
 
-    const targetDir = path.resolve(process.cwd(), projectName as string);
     const templateDir = path.resolve(__dirname, '../templates', projectType as string, stack as string);
 
     try {
@@ -109,7 +151,7 @@ async function run() {
             await fs.writeJson(targetPkgPath, pkg, { spaces: 2 });
         }
 
-        s.stop(`Arquivos copiados para ${color.green(`./${String(projectName)}`)}`);
+        s.stop(`Arquivos copiados para ${color.green(displayDir)}`);
 
         // Inicialização do Git
         if (shouldInitGit) {
@@ -127,7 +169,7 @@ async function run() {
 
         // Instruções de finalização
         const nextSteps = [
-            `cd ${String(projectName)}`,
+            ...(isCurrentFolder ? [] : [`cd ${String(projectName)}`]),
             ...(shouldInstallDeps ? [] : ['npm install']),
             'npm run dev',
         ].join('\n');
