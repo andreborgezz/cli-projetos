@@ -2,11 +2,11 @@
   "name": "template-typescript-express",
   "version": "1.0.0",
   "description": "Express + TypeScript template",
-  "main": "dist/index.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "tsx src/index.ts",
+    "dev": "tsx server.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.21.0"

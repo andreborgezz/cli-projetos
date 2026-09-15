@@ -106,6 +106,58 @@ async function run() {
         options: stackOptions[projectType as keyof typeof stackOptions],
     });
     handleCancel(stack);
+    // 3. Configurações opcionais
+
+    // 3.1 Ferramentas de qualidade de código
+    const enableEslint = await p.confirm({
+        message: 'Deseja configurar ESLint + Prettier?',
+        initialValue: true,
+    });
+    handleCancel(enableEslint);
+
+    const enableHusky = await p.confirm({
+        message: 'Deseja configurar Husky (git hooks) para rodar lint antes de commit?',
+        initialValue: true,
+    });
+    handleCancel(enableHusky);
+
+    // 3.2 TailwindCSS (apenas para front-end)
+    let enableTailwind: boolean = false;
+    if (projectType === 'front-end') {
+        const _tailwind = await p.confirm({
+            message: 'Deseja configurar TailwindCSS?',
+            initialValue: true,
+        });
+        handleCancel(_tailwind);
+        enableTailwind = _tailwind as boolean;
+    }
+
+    // 3.3 Configuração de banco de dados (apenas para back-end)
+    let dbChoice: string = 'none';
+    let enablePrisma: boolean = false;
+    if (projectType === 'back-end') {
+        const _dbChoice = await p.select({
+            message: 'Qual banco de dados deseja configurar?',
+            options: [
+                { value: 'none', label: 'Nenhum', hint: 'Sem DB' },
+                { value: 'postgres', label: 'PostgreSQL', hint: 'Docker + Prisma' },
+                { value: 'mysql', label: 'MySQL', hint: 'Docker + Prisma' },
+                { value: 'mongodb', label: 'MongoDB', hint: 'Docker' },
+            ],
+            initialValue: 'none',
+        });
+        handleCancel(_dbChoice);
+        dbChoice = _dbChoice as string;
+
+        if (dbChoice !== 'none') {
+            const _prisma = await p.confirm({
+                message: 'Deseja configurar Prisma ORM?',
+                initialValue: true,
+            });
+            handleCancel(_prisma);
+            enablePrisma = _prisma as boolean;
+        }
+    }
 
     // 4. Preferências adicionais de ambiente
     const shouldInitGit = await p.confirm({
