@@ -11,6 +11,25 @@ Desenvolvido por **André Borges**, este gerador configura toda a estrutura base
 
 ## Como usar na sua máquina
 
+## Como instalar globalmente (Recomendado)
+
+Para que você possa digitar `cli-projetos` em **qualquer pasta do seu computador** e gerar um projeto novo, você precisa compilar e "linkar" o pacote globalmente no NPM.
+
+1. **Gere a build (compila o TypeScript para JavaScript):**
+   ```bash
+   npm run build
+   ```
+2. **Crie o link global:**
+   ```bash
+   npm link
+   ```
+
+Agora basta abrir qualquer terminal no seu computador e digitar o comando:
+```bash
+cli-projetos
+```
+---
+
 Para usar a ferramenta localmente, siga os passos abaixo:
 
 ### 1. Clonar o repositório
@@ -31,21 +50,3 @@ npm run dev
 ```
 
 ---
-
-## Como instalar globalmente (Recomendado)
-
-Para que você possa digitar `cli-projetos` em **qualquer pasta do seu computador** e gerar um projeto novo, você precisa compilar e "linkar" o pacote globalmente no NPM.
-
-1. **Gere a build (compila o TypeScript para JavaScript):**
-   ```bash
-   npm run build
-   ```
-2. **Crie o link global:**
-   ```bash
-   npm link
-   ```
-
-Agora basta abrir qualquer terminal no seu computador e digitar o comando:
-```bash
-cli-projetos
-```
